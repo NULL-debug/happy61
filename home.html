@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>六一快乐 - 烟花动画</title>
+    <!-- 引入 canvas-confetti 烟花库 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1e2b3c 0%, #0f1a24 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Comic Neue', 'Chalkboard SE', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-radius: 68px;
+            padding: 48px 32px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255,255,255,0.3);
+            transition: transform 0.2s ease;
+            border: 2px solid rgba(255,215,0,0.6);
+        }
+
+        .card:hover {
+            transform: scale(1.01);
+        }
+
+        h1 {
+            font-size: 4rem;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #FFD966, #FF6B6B, #FFB347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 24px;
+            word-break: keep-all;
+        }
+
+        .emoji-group {
+            font-size: 3.5rem;
+            margin: 20px 0;
+            animation: bounce 1s ease infinite alternate;
+        }
+
+        .sub {
+            font-size: 1.5rem;
+            color: #FF6F61;
+            background: #FFF3E0;
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 60px;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: inset 0 1px 3px #0001, 0 4px 8px #0001;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-15px); }
+        }
+
+        .fire-tip {
+            margin-top: 32px;
+            font-size: 1rem;
+            color: #FFE5B4;
+            background: rgba(0,0,0,0.5);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* 小手点击提示 */
+        .click-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #ffecb3;
+            background: rgba(0,0,0,0.4);
+            width: fit-content;
+            margin: 0 auto;
+            padding: 6px 16px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="emoji-group">
+        🎈 🎉 🧸 🍭
+    </div>
+    <h1>六一快乐！！！</h1>
+    <div class="emoji-group">
+        🎂 🎁 🎈
+    </div>
+    <div class="sub">
+        ✨ 愿你永远天真烂漫 ✨
+    </div>
+    <div class="fire-tip">
+        💥 点击任意位置 · 烟花绽放 💥
+    </div>
+</div>
+<div class="click-hint">
+    🧨 扫个码，庆祝儿童节！ 🧨
+</div>
+
+<script>
+    // 烟花配置：三种颜色主题
+    const colors = [
+        ['#FFD166', '#FF6B6B', '#4ECDC4', '#FF9F1C'],
+        ['#F72585', '#B5179E', '#7209B7', '#560BAD'],
+        ['#06FFA5', '#FFD100', '#FF5E5B', '#00BBF9']
+    ];
+
+    // 随机烟花函数
+    function shootRandomConfetti() {
+        const scalar = window.innerWidth / 800;
+        const opts = {
+            particleCount: Math.floor(60 * scalar),
+            spread: 70,
+            origin: { y: 0.6 },
+            startVelocity: 20,
+            colors: colors[Math.floor(Math.random() * colors.length)],
+            decay: 0.9,
+            ticks: 180,
+            gravity: 1.2,
+            drift: 0.5
+        };
+
+        // 随机左右偏移
+        opts.origin.x = Math.random() * 0.8 + 0.1;   // 0.1 ~ 0.9
+        canvasConfetti(opts);
+
+        // 偶尔加一点小彩带效果
+        if (Math.random() > 0.6) {
+            canvasConfetti({
+                particleCount: 30 * scalar,
+                spread: 45,
+                origin: { y: 0.5, x: Math.random() },
+                startVelocity: 15,
+                colors: ['#FFE55C', '#FFAA5E', '#FF6F61']
+            });
+        }
+    }
+
+    // 左右两侧同时发射 (像礼花)
+    function doubleCannon() {
+        const scalar = window.innerWidth / 1000;
+        canvasConfetti({
+            particleCount: 70 * scalar,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0, y: 0.7 },
+            startVelocity: 25,
+            colors: ['#FFD966', '#FF8C42', '#E76F51']
+        });
+        canvasConfetti({
+            particleCount: 70 * scalar,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1, y: 0.7 },
+            startVelocity: 25,
+            colors: ['#F4A261', '#E9C46A', '#2A9D8F']
+        });
+    }
+
+    // 屏幕中心大型烟花
+    function bigFirework() {
+        const scalar = Math.min(1.2, window.innerWidth / 600);
+        canvasConfetti({
+            particleCount: 180 * scalar,
+            spread: 120,
+            origin: { y: 0.55, x: 0.5 },
+            startVelocity: 28,
+            colors: ['#FF4D6D', '#FFB703', '#9C89B8', '#70D6FF'],
+            decay: 0.9,
+            gravity: 1,
+            ticks: 200
+        });
+    }
+
+    // 页面加载时自动来三波庆祝烟花
+    window.addEventListener('load', () => {
+        // 延迟一点点，让页面显示更平滑
+        setTimeout(() => {
+            bigFirework();
+            setTimeout(() => {
+                doubleCannon();
+                shootRandomConfetti();
+            }, 200);
+            setTimeout(() => {
+                for(let i = 0; i < 3; i++) {
+                    setTimeout(() => shootRandomConfetti(), i * 150);
+                }
+            }, 500);
+        }, 300);
+    });
+
+    // 全局点击 -> 烟花不断
+    document.body.addEventListener('click', (e) => {
+        // 为了让体验更好，每次点击产生多种烟花
+        bigFirework();
+        setTimeout(() => doubleCannon(), 80);
+        setTimeout(() => shootRandomConfetti(), 150);
+        setTimeout(() => shootRandomConfetti(), 300);
+        // 声音提醒？不用，但震动（如果有触屏且支持，可选）不要加声音以免尴尬，只用视觉效果
+    });
+
+    // 触摸屏也支持 (click 在移动端同样生效)
+    // 额外增加一个友好的防过度触发标记 但没必要，烟花本来就开心～
+</script>
+</body>
+</html>
